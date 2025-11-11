@@ -5,7 +5,7 @@
 
 %define download_script     /usr/lib/msttcore-fonts-installer/refresh-msttcore-fonts.sh
 %define cabfiles_sha256sums /usr/lib/msttcore-fonts-installer/cabfiles.sha256sums
-%define license_file        /usr/share/doc/msttcore-fonts-installer/READ_ME!
+%define license_file        /usr/share/doc/msttcore-fonts-installer
 
 Summary: Installer for Microsoft core TrueType fonts for better Windows Compatibility
 Name: %{fontname}-fonts-installer
@@ -18,10 +18,11 @@ Group: User Interface/X
 BuildArch: noarch
 Requires: curl
 Requires: cabextract
-Requires: xorg-x11-font-utils
-Requires: fontconfig
+Requires(post):   fontconfig
+Requires(postun): fontconfig
 Packager: Rob Janes <janes.rob gmail com>
-Source: msttcore-fonts-installer-2.6.tar.gz
+Source0: msttcore-fonts-installer-2.6.tar.gz
+Source1: refresh-msttcore-fonts.sh
 URL: http://mscorefonts2.sourceforge.net/
 
 %description
@@ -78,15 +79,8 @@ These are the fonts added:
 find . | cpio -pdm $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/%{fontdir}
-echo not-empty > $RPM_BUILD_ROOT/%{fontdir}/fonts.dir 
-echo not-empty > $RPM_BUILD_ROOT/%{fontdir}/fonts.scale 
 
-mkdir -p $RPM_BUILD_ROOT/etc/X11/xorg.conf.d/
-cat -> $RPM_BUILD_ROOT/etc/X11/xorg.conf.d/09-msttcore-fontpath.conf <<'EOT'
-Section "Files"
-  FontPath "%{fontdir}"
-EndSection
-EOT
+install -m 0755 %{SOURCE1} $RPM_BUILD_ROOT/usr/lib/msttcore-fonts-installer/refresh-msttcore-fonts.sh
 
 %clean
 [ "${RPM_BUILD_ROOT:-nonexistantdir}" != "/" ] && rm -rf ${RPM_BUILD_ROOT:-nonexistantdir}
@@ -114,23 +108,17 @@ if [ "$1" = "0" ]; then
     echo "### ttf files already removed" >&2
   fi
   if [ -x %{_bindir}/fc-cache ]; then
-    echo "### Rebuilding Xft font cache" >&2
-    %{_bindir}/fc-cache -f -v || :
+    %{_bindir}/fc-cache -f %{fontdir} || :
   fi
 
-  [ -f /etc/fonts/conf.d/09-msttcore-fonts.conf ] && rm -f /etc/fonts/conf.d/09-msttcore-fonts.conf
   [ -f "%{license_file}" ] && rm -f "%{license_file}"
   [ -f /usr/lib/msttcore-fonts-installer/installed-list.txt ] && rm -f /usr/lib/msttcore-fonts-installer/installed-list.txt
 
-  echo "### Removing %{fontdir} from the core X fonts path" >&2
-  xset -fp %{fontdir} || :
-  xset fp rehash || :
 fi
 
 %files
 %defattr(-,root,root,-)
 %attr(-,root,root) %{fontdir}
-%config(noreplace) /etc/X11/xorg.conf.d/09-msttcore-fontpath.conf
 %docdir /usr/share/doc/msttcore-fonts-installer
 %attr(-,root,root) /usr/share/doc/msttcore-fonts-installer
 
