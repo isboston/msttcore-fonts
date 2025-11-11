@@ -1,0 +1,8 @@
+This repository does not contain Microsoft fonts themselves.
+
+The provided scripts and packaging files are distributed under the MIT License (see below),
+but the Microsoft Core Fonts are proprietary and distributed under the
+Microsoft End User License Agreement (EULA):
+https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/
+
+You must accept that license to download and use the fonts.
