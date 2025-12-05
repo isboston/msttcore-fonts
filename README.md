@@ -7,13 +7,13 @@ Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.
 
 ## Quick Commands (RPM-package)
 
-### Build RPM-package
+### Build
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
 bash tools/build.sh
 ```
-### Install .rpm
+### Install
 ```bash
 dnf -y install dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm
 ```
@@ -37,7 +37,7 @@ sudo apt-get update
 sudo apt-get install -y build-essential debhelper cabextract fontconfig
 ```
 
-### Build DEB-package
+### Build
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
@@ -45,7 +45,7 @@ dpkg-buildpackage -us -uc
 cd ..
 ls -1 ttf-mscorefonts-installer_*_all.deb
 ```
-### Install .deb
+### Install
 ```bash
 sudo apt install ./ttf-mscorefonts-installer_*_all.deb
 ```
