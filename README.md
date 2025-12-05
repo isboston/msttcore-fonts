@@ -5,15 +5,15 @@ Packaging and installer scripts for Microsoft TrueType Core Fonts (Arial, Times 
 Scripts are released under the MIT License.  
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
 
-## Quick Commands (Build)
+## Quick Commands (RPM-package)
 
-### Build
+### Build RPM-package
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
 bash tools/build.sh
 ```
-### Install
+### Install .rpm
 ```bash
 dnf -y install dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm
 ```
@@ -29,3 +29,36 @@ rm -rf /usr/share/fonts/msttcore || true
 fc-cache -f || true
 ```
 
+## Quick Commands (DEB-package)
+
+### Install build dependencies
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential debhelper cabextract fontconfig
+```
+
+### Build DEB-package
+```bash
+git clone https://github.com/isboston/msttcore-fonts.git
+cd msttcore-fonts
+dpkg-buildpackage -us -uc
+cd ..
+ls -1 ttf-mscorefonts-installer_*_all.deb
+```
+### Install .deb
+```bash
+sudo apt install ./ttf-mscorefonts-installer_*_all.deb
+```
+### Check
+```bash
+# should show Arial / Verdana / Times New Roman from msttcorefonts
+fc-list | egrep -i 'arial|verdana|times new roman' | head
+# verify that ClearType fonts are registered in fontconfig
+fc-list | egrep -i 'calibri|cambria|candara|consolas|constantia|corbel'
+```
+### Remove
+```bash
+sudo apt remove -y ttf-mscorefonts-installer || true
+sudo rm -rf /usr/share/fonts/truetype/msttcorefonts || true
+sudo fc-cache -f || true
+```
