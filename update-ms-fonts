@@ -224,7 +224,9 @@ if [ -z "$QUIETMODE" ] ; then
 fi
 
 # Install ClearType fonts (Calibri, Cambria, Candara, Consolas, Constantia, Corbel)
-[ -x /usr/lib/msttcorefonts/cleartype-fonts ] && /usr/lib/msttcorefonts/cleartype-fonts || true
+if [ -f /usr/lib/msttcorefonts/cleartype-fonts ]; then
+    /bin/sh /usr/lib/msttcorefonts/cleartype-fonts || true
+fi
 
 #DEBHELPER#
 
