@@ -9,7 +9,7 @@ Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.
 
 ### Build
 ```bash
-git clone https://github.com/isboston/msttcore-fonts.git -b feature/rpm
+git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
 bash tools/build.sh
 ```
