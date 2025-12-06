@@ -61,8 +61,6 @@ Install runtime dependencies and the package:
 ```bash
 sudo dnf install -y epel-release
 sudo dnf install -y fontconfig cabextract
-```
-```bash
 sudo dnf install -y ./msttcore-fonts-installer-2.6-1.noarch.rpm
 ```
 
@@ -71,7 +69,7 @@ Check that fonts are available:
 fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|corbel' | head
 ```
 
-## Cleanup / Removal
+## Cleanup
 
 Debian / Ubuntu (DEB)
 ```bash
