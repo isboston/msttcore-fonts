@@ -1,66 +1,90 @@
 # msttcore-fonts
-Packaging and installer scripts for Microsoft TrueType Core Fonts (Arial, Times New Roman, Verdana, etc.) on Linux.
+Packaging and installer scripts for Microsoft TrueType Core Fonts (Arial, Times New Roman, Verdana, Calibri, Cambria, Candara, Consolas, Constantia, Corbel, etc.) on Linux.
+
+Builds:
+
+- **DEB** package: `ttf-mscorefonts-installer`
+- **RPM** package: `msttcore-fonts-installer`
 
 ## License
-Scripts are released under the MIT License.  
+Scripts are released under the MIT License.
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
 
-## Quick Commands (RPM-package)
+## Build (on Ubuntu 24.04)
 
-### Build
-```bash
-git clone https://github.com/isboston/msttcore-fonts.git
-cd msttcore-fonts
-bash build.sh rpm
-```
-### Install
-```bash
-dnf install ./msttcore-fonts-installer-2.6-1.noarch.rpm
-```
-### Check
-```bash
-dnf -y install epel-release
-dnf -y install cabextract fontconfig
-fc-list | egrep -i 'arial|verdana|times new roman' | head
-ls -l /usr/share/fonts/msttcore | head
-```
-### Remove
-```bash
-dnf -y remove msttcore-fonts-installer || true
-rm -rf /usr/share/fonts/msttcore || true
-fc-cache -f || true
-```
+All examples below assume build is done on **Ubuntu 24.04**.
 
-## Quick Commands (DEB-package)
+Install build dependencies:
 
-### Install build dependencies
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential debhelper cabextract fontconfig
+sudo apt-get install -y build-essential debhelper cabextract fontconfig rpm
 ```
 
-### Build
+Clone and build both packages:
+
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
-bash build.sh deb
-ls -1 dist/debbuild/ttf-mscorefonts-installer_*_all.deb
 ```
-### Install
+build both RPM and DEB
 ```bash
-sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_*_all.deb
+bash build.sh rpm deb
 ```
-### Check
+Resulting artifacts:
+
+RPM: dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm
+DEB: dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb
+
+## Install & Test (DEB package: Debian/Ubuntu)
+On a Debian/Ubuntu system (can be the same builder host or another one), install:
 ```bash
-apt install -y fontconfig
-# should show Arial / Verdana / Times New Roman from msttcorefonts
-fc-list | egrep -i 'arial|verdana|times new roman' | head
-# verify that ClearType fonts are registered in fontconfig
-fc-list | egrep -i 'calibri|cambria|candara|consolas|constantia|corbel'
+sudo apt-get update
+sudo apt-get install -y fontconfig  # for fc-list
+sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb
 ```
-### Remove
+
+Verify that both classic core fonts and ClearType fonts are registered:
+```bash
+fc-list | egrep -i 'arial|verdana|times new roman|calibri|cambria|candara|consolas|constantia|corbel' | head
+```
+
+## Install & Test (RPM package: RHEL/CentOS/Rocky/Alma)
+
+Copy the built RPM to the target RHEL-like system, for example:
+
+```bash
+scp dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm root@server:/root/
+```
+
+Install runtime dependencies and the package:
+```bash
+sudo dnf install -y epel-release
+sudo dnf install -y fontconfig cabextract
+```
+```bash
+sudo dnf install -y ./msttcore-fonts-installer-2.6-1.noarch.rpm
+```
+
+Check that fonts are available:
+```bash
+fc-list | egrep -i 'arial|verdana|times new roman|calibri|cambria|candara|consolas|constantia|corbel' | head
+```
+
+## Cleanup / Removal
+
+### Debian / Ubuntu (DEB)
+
 ```bash
 sudo apt remove -y ttf-mscorefonts-installer || true
 sudo rm -rf /usr/share/fonts/truetype/msttcorefonts || true
+sudo fc-cache -f || true
+```
+
+### RHEL / CentOS / Rocky / Alma (RPM)
+
+```bash
+sudo dnf remove -y msttcore-fonts-installer || true
+sudo rm -rf /usr/share/fonts/msttcore || true
 sudo fc-cache -f || true
 ```
