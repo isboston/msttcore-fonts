@@ -11,7 +11,7 @@ Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
-bash tools/build.sh
+bash build.sh rpm
 ```
 ### Install
 ```bash
@@ -41,13 +41,12 @@ sudo apt-get install -y build-essential debhelper cabextract fontconfig
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
-dpkg-buildpackage -us -uc
-cd ..
-ls -1 ttf-mscorefonts-installer_*_all.deb
+bash build.sh deb
+ls -1 dist/debbuild/ttf-mscorefonts-installer_*_all.deb
 ```
 ### Install
 ```bash
-sudo apt install ./ttf-mscorefonts-installer_*_all.deb
+sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_*_all.deb
 ```
 ### Check
 ```bash
