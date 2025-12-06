@@ -40,6 +40,7 @@ Resulting artifacts:
 - RPM `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
 
 ## Install and check on Debian/Ubuntu
+Install dependencies and the package:
 ```bash
 sudo apt-get update
 sudo apt-get install -y fontconfig
