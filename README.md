@@ -33,8 +33,8 @@ bash build.sh rpm deb
 ```
 Resulting artifacts:
 
-- **RPM** package: `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
-- **DEB** package: `dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb`
+- **RPM** `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
+- **DEB** `dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb`
 
 ## Install & Test (DEB package: Debian/Ubuntu)
 On a Debian/Ubuntu system (can be the same builder host or another one), install:
