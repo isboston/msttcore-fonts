@@ -46,7 +46,7 @@ sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb
 
 Verify that both classic core fonts and ClearType fonts are registered:
 ```bash
-fc-list | egrep -i 'arial|verdana|times new roman|calibri|cambria|candara|consolas|constantia|corbel' | head
+fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|corbel' | head
 ```
 
 ## Install & Test (RPM package: RHEL/CentOS/Rocky/Alma)
@@ -68,21 +68,19 @@ sudo dnf install -y ./msttcore-fonts-installer-2.6-1.noarch.rpm
 
 Check that fonts are available:
 ```bash
-fc-list | egrep -i 'arial|verdana|times new roman|calibri|cambria|candara|consolas|constantia|corbel' | head
+fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|corbel' | head
 ```
 
 ## Cleanup / Removal
 
-### Debian / Ubuntu (DEB)
-
+Debian / Ubuntu (DEB)
 ```bash
 sudo apt remove -y ttf-mscorefonts-installer || true
 sudo rm -rf /usr/share/fonts/truetype/msttcorefonts || true
 sudo fc-cache -f || true
 ```
 
-### RHEL / CentOS / Rocky / Alma (RPM)
-
+RHEL / CentOS / Rocky / Alma (RPM)
 ```bash
 sudo dnf remove -y msttcore-fonts-installer || true
 sudo rm -rf /usr/share/fonts/msttcore || true
