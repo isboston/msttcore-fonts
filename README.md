@@ -4,8 +4,8 @@ Packaging and installer scripts for Microsoft TrueType Core Fonts
 
 Builds packages:
 
-- **DEB** `ttf-mscorefonts-installer`
-- **RPM** `msttcore-fonts-installer`
+- DEB `ttf-mscorefonts-installer`
+- RPM `msttcore-fonts-installer`
 
 ## License
 Scripts are released under the MIT License.
