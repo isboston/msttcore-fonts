@@ -28,6 +28,9 @@ Clone and build both packages:
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
 bash build.sh rpm deb
+# or build separately:
+# bash build.sh deb
+# bash build.sh rpm
 ```
 
 Resulting artifacts:
