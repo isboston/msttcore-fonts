@@ -12,9 +12,6 @@ Scripts are released under the MIT License.
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
 
 ## Build (on Ubuntu 24.04)
-
-All examples below assume build is done on **Ubuntu 24.04**.
-
 Install build dependencies:
 
 ```bash
@@ -43,7 +40,6 @@ Resulting artifacts:
 - RPM `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
 
 ## Install and check on Debian/Ubuntu
-
 ```bash
 sudo apt-get update
 sudo apt-get install -y fontconfig
@@ -56,7 +52,6 @@ fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|co
 ```
 
 ## Install and check on RHEL/CentOS
-
 Copy the built RPM to the target RHEL-like system, for example:
 
 ```bash
@@ -76,7 +71,6 @@ fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|co
 ```
 
 ## Cleanup
-
 Debian/Ubuntu (DEB)
 ```bash
 sudo apt remove -y ttf-mscorefonts-installer || true
