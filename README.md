@@ -52,6 +52,7 @@ sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_*_all.deb
 ```
 ### Check
 ```bash
+apt install -y fontconfig
 # should show Arial / Verdana / Times New Roman from msttcorefonts
 fc-list | egrep -i 'arial|verdana|times new roman' | head
 # verify that ClearType fonts are registered in fontconfig
