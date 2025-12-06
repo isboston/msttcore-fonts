@@ -23,14 +23,18 @@ sudo apt-get install -y build-essential debhelper cabextract fontconfig rpm
 ```
 
 Clone and build both packages:
-
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
 bash build.sh rpm deb
-# or build separately:
-# bash build.sh deb
-# bash build.sh rpm
+```
+Build only DEB:
+```bash
+bash build.sh deb
+```
+Build only RPM:
+```bash
+bash build.sh rpm
 ```
 
 Resulting artifacts:
