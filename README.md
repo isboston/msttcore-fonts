@@ -1,10 +1,10 @@
 # msttcore-fonts
 Packaging and installer scripts for Microsoft TrueType Core Fonts (Arial, Times New Roman, Verdana, Calibri, Cambria, Candara, Consolas, Constantia, Corbel, etc.) on Linux.
 
-Builds:
+Builds package:
 
-- **DEB** package: `ttf-mscorefonts-installer`
-- **RPM** package: `msttcore-fonts-installer`
+- **DEB** `ttf-mscorefonts-installer`
+- **RPM** `msttcore-fonts-installer`
 
 ## License
 Scripts are released under the MIT License.
