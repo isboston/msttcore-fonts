@@ -19,6 +19,8 @@ dnf -y install dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.r
 ```
 ### Check
 ```bash
+dnf -y install epel-release
+dnf -y install cabextract fontconfig
 fc-list | egrep -i 'arial|verdana|times new roman' | head
 ls -l /usr/share/fonts/msttcore | head
 ```
