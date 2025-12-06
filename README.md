@@ -15,7 +15,7 @@ bash build.sh rpm
 ```
 ### Install
 ```bash
-dnf -y install dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm
+dnf install ./msttcore-fonts-installer-2.6-1.noarch.rpm
 ```
 ### Check
 ```bash
