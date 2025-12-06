@@ -31,15 +31,25 @@ build_rpm() {
 
   mkdir -p "$SOURCES" "$SPECS"
 
-  if command -v dnf >/dev/null 2>&1; then
+  if command -v apt-get >/dev/null 2>&1; then
+    echo "Detected apt-get, installing RPM build deps on Debian/Ubuntu..."
+    apt-get update
+    apt-get install -y rpm curl cabextract fontconfig gzip tar
+  elif command -v dnf >/dev/null 2>&1; then
+    echo "Detected dnf, installing RPM build deps..."
     dnf -y install epel-release || true
     dnf -y install rpm-build curl cabextract fontconfig gzip tar || true
   elif command -v yum >/dev/null 2>&1; then
+    echo "Detected yum, installing RPM build deps..."
     yum -y install epel-release || true
     yum -y install rpm-build curl cabextract fontconfig gzip tar || true
+  else
+    echo "No supported package manager found (apt-get/dnf/yum). Cannot install RPM build tools." >&2
+    exit 1
   fi
 
-  curl -fL -o "$TARBALL" "https://downloads.sourceforge.net/project/mscorefonts2/sources/${PKG_NAME}-${PKG_VER}.tar.gz"
+  curl -fL -o "$TARBALL" \
+    "https://downloads.sourceforge.net/project/mscorefonts2/sources/${PKG_NAME}-${PKG_VER}.tar.gz"
 
   cp -f "$ROOT_DIR/rpm/refresh-msttcore-fonts.sh" "$SOURCES/refresh-msttcore-fonts.sh"
   cp -f "$SPEC_SRC" "$SPECS/"
@@ -55,6 +65,7 @@ build_deb() {
   echo "=== Building DEB package ==="
 
   if command -v apt-get >/dev/null 2>&1; then
+    echo "Installing DEB build deps via apt-get..."
     apt-get update
     apt-get install -y build-essential debhelper cabextract fontconfig
   fi
