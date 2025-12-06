@@ -1,5 +1,6 @@
 # msttcore-fonts
-Packaging and installer scripts for Microsoft TrueType Core Fonts (Arial, Times New Roman, Verdana, Calibri, Cambria, Candara, Consolas, Constantia, Corbel, etc.) on Linux.
+Packaging and installer scripts for Microsoft TrueType Core Fonts  
+(Arial, Verdana, Calibri, Cambria, Candara, Consolas, Constantia, Corbel, etc.) on Linux.
 
 Builds packages:
 
@@ -26,30 +27,28 @@ Clone and build both packages:
 ```bash
 git clone https://github.com/isboston/msttcore-fonts.git
 cd msttcore-fonts
-```
-build both RPM and DEB
-```bash
 bash build.sh rpm deb
 ```
+
 Resulting artifacts:
 
 - **DEB** `dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb`
 - **RPM** `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
 
-## Install & Test (DEB package: Debian/Ubuntu)
-On a Debian/Ubuntu system (can be the same builder host or another one), install:
+## Install and test (DEB: Debian/Ubuntu)
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y fontconfig
 sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb
 ```
 
-Verify that both classic core fonts and ClearType fonts are registered:
+Check that fonts are available:
 ```bash
 fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|corbel' | head
 ```
 
-## Install & Test (RPM package: RHEL/CentOS/Rocky/Alma)
+## Install and test (RPM: RHEL/CentOS)
 
 Copy the built RPM to the target RHEL-like system, for example:
 
@@ -57,7 +56,7 @@ Copy the built RPM to the target RHEL-like system, for example:
 scp dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm root@server:/root/
 ```
 
-Install runtime dependencies and the package:
+Install dependencies and the package:
 ```bash
 sudo dnf install -y epel-release
 sudo dnf install -y fontconfig cabextract
@@ -71,14 +70,14 @@ fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|co
 
 ## Cleanup
 
-Debian / Ubuntu (DEB)
+Debian/Ubuntu (DEB)
 ```bash
 sudo apt remove -y ttf-mscorefonts-installer || true
 sudo rm -rf /usr/share/fonts/truetype/msttcorefonts || true
 sudo fc-cache -f || true
 ```
 
-RHEL / CentOS / Rocky / Alma (RPM)
+RHEL/CentOS (RPM)
 ```bash
 sudo dnf remove -y msttcore-fonts-installer || true
 sudo rm -rf /usr/share/fonts/msttcore || true
