@@ -35,7 +35,7 @@ Resulting artifacts:
 - **DEB** `dist/debbuild/ttf-mscorefonts-installer_3.8.1_all.deb`
 - **RPM** `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
 
-## Install and test (DEB: Debian/Ubuntu)
+## Install and check on Debian/Ubuntu
 
 ```bash
 sudo apt-get update
@@ -48,7 +48,7 @@ Check that fonts are available:
 fc-list | egrep -i 'arial|verdana|calibri|cambria|candara|consolas|constantia|corbel' | head
 ```
 
-## Install and test (RPM: RHEL/CentOS)
+## Install and check on RHEL/CentOS
 
 Copy the built RPM to the target RHEL-like system, for example:
 
