@@ -11,6 +11,10 @@ Builds packages:
 Scripts are released under the MIT License.
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
 
+## Prebuilt packages
+You can download ready-made DEB/RPM packages from GitHub Releases:
+- https://github.com/isboston/msttcore-fonts/releases/tag/fonts
+
 ## Build (on Ubuntu 24.04)
 Install build dependencies:
 
