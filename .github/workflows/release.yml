@@ -18,8 +18,7 @@ jobs:
 
       - name: Build DEB and RPM
         run: |
-          chmod +x build.sh
-          ./build.sh rpm deb
+          sudo build.sh rpm deb
 
       - name: Create / Update GitHub Release
         uses: softprops/action-gh-release@v2
