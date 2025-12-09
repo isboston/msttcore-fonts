@@ -1,3 +1,11 @@
+msttcorefonts (3.8.2) unstable; urgency=medium
+
+  * Add bundled ClearType fonts:
+    Calibri, Cambria, Candara, Consolas, Constantia, Corbel.
+  * Keep original installer behaviour and EULA handling.
+
+ -- Vladimir Ischenko <vladimir.ischenko@onlyoffice.com>  Tue, 09 Dec 2025 12:00:00 +0100
+
 msttcorefonts (3.8.1) unstable; urgency=medium
 
   * Correct directory name for READ_ME!.gz (closes: #996010).
