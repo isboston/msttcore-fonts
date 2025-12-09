@@ -30,6 +30,9 @@ Description: Installer for Microsoft TrueType core fonts
    Verdana (Bold, Italic, Bold Italic)
    Webdings
  .
+Additionally, this build also installs ClearType fonts:
+  Calibri, Cambria, Candara, Consolas, Constantia, Corbel.
+ .
  You will need an Internet connection to download these fonts if you
  don't already have them.
  .
