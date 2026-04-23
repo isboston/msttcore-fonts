@@ -76,19 +76,12 @@ jobs:
             --pattern 'ttf-mscorefonts-installer_*.deb' \
             --pattern 'msttcore-fonts-installer-*.noarch.rpm'
 
-      - name: Create archive tag
-        if: steps.meta.outputs.archive_previous == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.meta.outputs.archive_tag }}" -m "Archived release for ${{ steps.meta.outputs.previous_commit }}" "${{ steps.meta.outputs.previous_commit }}"
-          git push origin "refs/tags/${{ steps.meta.outputs.archive_tag }}"
-
       - name: Publish archive release
         if: steps.meta.outputs.archive_previous == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.archive_tag }}
+          target_commitish: fonts
           name: ${{ steps.meta.outputs.archive_name }}
           body: |
             Archived package snapshot for `${{ steps.meta.outputs.previous_commit }}`.
