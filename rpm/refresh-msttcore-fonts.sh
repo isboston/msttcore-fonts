@@ -79,9 +79,9 @@ function check_file {
 function download_file {
   local mirror="$1" file="$2"
   if type wget > /dev/null 2>&1; then
-    wget ${VERBOSE_FLAG:---no-verbose} --timeout=5 -O $file $mirror/$file
+    wget ${VERBOSE_FLAG:---no-verbose} --connect-timeout=15 --read-timeout=90 -O $file $mirror/$file
   elif type curl > /dev/null 2>&1; then
-    curl ${VERBOSE_FLAG:--s -S} -R -L -o "$file" --connect-timeout 5 "$mirror/$file"
+    curl ${VERBOSE_FLAG:--s -S} -R -L -o "$file" --connect-timeout 15 --max-time 90 "$mirror/$file"
   fi
 }
 
@@ -176,8 +176,8 @@ cd $TMP/downloads
 
 progress "Using tmp directory $TMP"
 
-mirror=http://downloads.sourceforge.net/corefonts
-mirror_update=http://downloads.sourceforge.net/mscorefonts2
+mirror=https://downloads.sourceforge.net/corefonts
+mirror_update=https://downloads.sourceforge.net/mscorefonts2
 
 andale32_md5="cbdc2fdd7d2ed0832795e86a8b9ee19a"
 arial32_md5="9637df0e91703179f0723ec095a36cb5"
