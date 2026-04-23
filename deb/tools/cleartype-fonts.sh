@@ -39,11 +39,11 @@ if [ -f eula.txt ]; then
     gzip -f "$DOC_DIR/EULA-cleartype.txt" || true
 fi
 
-# CAB with ttf files
+# CAB with ClearType font files
 cabextract -q -F 'ppviewer.cab' "$PPT_EXE"
 [ -f ppviewer.cab ] || { echo "ppviewer.cab not found"; exit 1; }
 
-cabextract -q -F '*.ttf' --directory="$FONTDIR" ppviewer.cab
+cabextract -q -F '*.ttf' -F '*.ttc' --directory="$FONTDIR" ppviewer.cab
 
 if command -v fc-cache >/dev/null 2>&1; then
     echo "Updating font cache..." >&2
