@@ -75,22 +75,47 @@ jobs:
             --pattern 'ttf-mscorefonts-installer_*.deb' \
             --pattern 'msttcore-fonts-installer-*.noarch.rpm'
 
-      - name: Rename previous assets for archive
+      - name: Keep only changed previous assets
         if: steps.meta.outputs.archive_previous == 'true'
+        id: archive
         run: |
           set -euo pipefail
           shopt -s nullglob
           for file in "${{ steps.meta.outputs.archive_dir }}"/*; do
             base="$(basename "${file}")"
+            candidate=
+
+            if [ -f "dist/debbuild/${base}" ]; then
+              candidate="dist/debbuild/${base}"
+            elif [ -f "dist/rpmbuild/RPMS/noarch/${base}" ]; then
+              candidate="dist/rpmbuild/RPMS/noarch/${base}"
+            fi
+
+            if [ -n "${candidate}" ]; then
+              old_hash="$(sha256sum "${file}" | awk '{print $1}')"
+              new_hash="$(sha256sum "${candidate}" | awk '{print $1}')"
+
+              if [ "${old_hash}" = "${new_hash}" ]; then
+                rm -f "${file}"
+                continue
+              fi
+            fi
+
             mv "${file}" "${{ steps.meta.outputs.archive_dir }}/${{ steps.meta.outputs.archive_prefix }}-${base}"
           done
+
+          if compgen -G "${{ steps.meta.outputs.archive_dir }}/*" > /dev/null; then
+            echo "has_archive_assets=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_archive_assets=false" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Prepare upload file list
         id: files
         run: |
           {
             echo 'release_files<<EOF'
-            if [ "${{ steps.meta.outputs.archive_previous }}" = "true" ]; then
+            if [ "${{ steps.archive.outputs.has_archive_assets }}" = "true" ]; then
               echo "${{ steps.meta.outputs.archive_dir }}/*"
             fi
             echo 'dist/debbuild/ttf-mscorefonts-installer_*.deb'
@@ -112,7 +137,7 @@ jobs:
           name: "msttcore-fonts packages"
           body: |
             Rolling release for `${{ github.sha }}`.
-            Older package snapshots are kept in this release with timestamped filenames.
+            Older package snapshots with different hashes are kept in this release with timestamped filenames.
           draft: false
           prerelease: false
           make_latest: "true"
