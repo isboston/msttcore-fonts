@@ -1,4 +1,4 @@
-name: Build DEB/RPM and keep asset history
+name: Build DEB/RPM and update rolling release
 
 on:
   workflow_dispatch:
@@ -20,108 +20,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch tags
-        run: |
-          git fetch --force --tags origin
-
       - name: Build DEB and RPM
         run: |
           sudo bash build.sh rpm deb
 
-      - name: Prepare release metadata
-        id: meta
+      - name: Remove old archived assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-
-          archive_previous=false
-          previous_commit=
-          previous_short=
-          archive_stamp=
-          archive_prefix=
-          archive_dir="${RUNNER_TEMP}/archive-assets-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-
-          if git rev-parse -q --verify refs/tags/fonts >/dev/null; then
-            previous_commit="$(git rev-parse refs/tags/fonts^{commit})"
-            previous_short="$(git rev-parse --short=7 "${previous_commit}")"
-
-            if [ "${previous_commit}" != "${GITHUB_SHA}" ] && gh release view fonts >/dev/null 2>&1; then
-              archive_stamp="$(date -u +%Y%m%d-%H%M%S)"
-              archive_prefix="${archive_stamp}-${previous_short}"
-              archive_previous=true
-            fi
+          if ! gh release view fonts >/dev/null 2>&1; then
+            exit 0
           fi
 
-          {
-            echo "archive_previous=${archive_previous}"
-            echo "previous_commit=${previous_commit}"
-            echo "previous_short=${previous_short}"
-            echo "archive_stamp=${archive_stamp}"
-            echo "archive_prefix=${archive_prefix}"
-            echo "archive_dir=${archive_dir}"
-          } >> "${GITHUB_OUTPUT}"
-
-      - name: Download previous rolling release assets
-        if: steps.meta.outputs.archive_previous == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          rm -rf "${{ steps.meta.outputs.archive_dir }}"
-          mkdir -p "${{ steps.meta.outputs.archive_dir }}"
-          gh release download fonts \
-            --dir "${{ steps.meta.outputs.archive_dir }}" \
-            --pattern 'ttf-mscorefonts-installer_*.deb' \
-            --pattern 'msttcore-fonts-installer-*.noarch.rpm'
-
-      - name: Keep only changed previous assets
-        if: steps.meta.outputs.archive_previous == 'true'
-        id: archive
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          for file in "${{ steps.meta.outputs.archive_dir }}"/*; do
-            base="$(basename "${file}")"
-            candidate=
-
-            if [ -f "dist/debbuild/${base}" ]; then
-              candidate="dist/debbuild/${base}"
-            elif [ -f "dist/rpmbuild/RPMS/noarch/${base}" ]; then
-              candidate="dist/rpmbuild/RPMS/noarch/${base}"
-            fi
-
-            if [ -n "${candidate}" ]; then
-              old_hash="$(sha256sum "${file}" | awk '{print $1}')"
-              new_hash="$(sha256sum "${candidate}" | awk '{print $1}')"
-
-              if [ "${old_hash}" = "${new_hash}" ]; then
-                rm -f "${file}"
-                continue
-              fi
-            fi
-
-            mv "${file}" "${{ steps.meta.outputs.archive_dir }}/${{ steps.meta.outputs.archive_prefix }}-${base}"
-          done
-
-          if compgen -G "${{ steps.meta.outputs.archive_dir }}/*" > /dev/null; then
-            echo "has_archive_assets=true" >> "${GITHUB_OUTPUT}"
-          else
-            echo "has_archive_assets=false" >> "${GITHUB_OUTPUT}"
-          fi
-
-      - name: Prepare upload file list
-        id: files
-        run: |
-          {
-            echo 'release_files<<EOF'
-            if [ "${{ steps.archive.outputs.has_archive_assets }}" = "true" ]; then
-              echo "${{ steps.meta.outputs.archive_dir }}/*"
-            fi
-            echo 'dist/debbuild/ttf-mscorefonts-installer_*.deb'
-            echo 'dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm'
-            echo 'EOF'
-          } >> "${GITHUB_OUTPUT}"
+          while IFS= read -r name; do
+            case "$name" in
+              20????????-??????-*-ttf-mscorefonts-installer_*.deb|20????????-??????-*-msttcore-fonts-installer-*.noarch.rpm)
+                gh release delete-asset fonts "$name" --yes
+                ;;
+            esac
+          done < <(gh release view fonts --json assets --jq '.assets[].name')
 
       - name: Move rolling release tag
         run: |
@@ -137,13 +55,12 @@ jobs:
           name: "msttcore-fonts packages"
           body: |
             Rolling release for `${{ github.sha }}`.
-            Older package snapshots with different hashes are kept in this release with timestamped filenames.
           draft: false
           prerelease: false
-          make_latest: "true"
           overwrite_files: true
           fail_on_unmatched_files: true
-          files: ${{ steps.files.outputs.release_files }}
+          files: |
+            dist/debbuild/ttf-mscorefonts-installer_*.deb
+            dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
