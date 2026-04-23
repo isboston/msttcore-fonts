@@ -1,4 +1,4 @@
-name: Build DEB/RPM and keep release history
+name: Build DEB/RPM and keep asset history
 
 on:
   workflow_dispatch:
@@ -38,8 +38,8 @@ jobs:
           archive_previous=false
           previous_commit=
           previous_short=
-          archive_tag=
-          archive_name=
+          archive_stamp=
+          archive_prefix=
           archive_dir="${RUNNER_TEMP}/archive-assets-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
           if git rev-parse -q --verify refs/tags/fonts >/dev/null; then
@@ -47,9 +47,8 @@ jobs:
             previous_short="$(git rev-parse --short=7 "${previous_commit}")"
 
             if [ "${previous_commit}" != "${GITHUB_SHA}" ] && gh release view fonts >/dev/null 2>&1; then
-              stamp="$(date -u +%Y%m%d-%H%M%S)"
-              archive_tag="archive-${stamp}-${previous_short}-r${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
-              archive_name="msttcore-fonts packages ${stamp} (${previous_short})"
+              archive_stamp="$(date -u +%Y%m%d-%H%M%S)"
+              archive_prefix="${archive_stamp}-${previous_short}"
               archive_previous=true
             fi
           fi
@@ -58,8 +57,8 @@ jobs:
             echo "archive_previous=${archive_previous}"
             echo "previous_commit=${previous_commit}"
             echo "previous_short=${previous_short}"
-            echo "archive_tag=${archive_tag}"
-            echo "archive_name=${archive_name}"
+            echo "archive_stamp=${archive_stamp}"
+            echo "archive_prefix=${archive_prefix}"
             echo "archive_dir=${archive_dir}"
           } >> "${GITHUB_OUTPUT}"
 
@@ -76,25 +75,28 @@ jobs:
             --pattern 'ttf-mscorefonts-installer_*.deb' \
             --pattern 'msttcore-fonts-installer-*.noarch.rpm'
 
-      - name: Publish archive release
+      - name: Rename previous assets for archive
         if: steps.meta.outputs.archive_previous == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.meta.outputs.archive_tag }}
-          target_commitish: fonts
-          name: ${{ steps.meta.outputs.archive_name }}
-          body: |
-            Archived package snapshot for `${{ steps.meta.outputs.previous_commit }}`.
-          draft: false
-          prerelease: false
-          make_latest: "false"
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          files: |
-            ${{ steps.meta.outputs.archive_dir }}/ttf-mscorefonts-installer_*.deb
-            ${{ steps.meta.outputs.archive_dir }}/msttcore-fonts-installer-*.noarch.rpm
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for file in "${{ steps.meta.outputs.archive_dir }}"/*; do
+            base="$(basename "${file}")"
+            mv "${file}" "${{ steps.meta.outputs.archive_dir }}/${{ steps.meta.outputs.archive_prefix }}-${base}"
+          done
+
+      - name: Prepare upload file list
+        id: files
+        run: |
+          {
+            echo 'release_files<<EOF'
+            if [ "${{ steps.meta.outputs.archive_previous }}" = "true" ]; then
+              echo "${{ steps.meta.outputs.archive_dir }}/*"
+            fi
+            echo 'dist/debbuild/ttf-mscorefonts-installer_*.deb'
+            echo 'dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm'
+            echo 'EOF'
+          } >> "${GITHUB_OUTPUT}"
 
       - name: Move rolling release tag
         run: |
@@ -110,14 +112,13 @@ jobs:
           name: "msttcore-fonts packages"
           body: |
             Rolling release for `${{ github.sha }}`.
+            Older package snapshots are kept in this release with timestamped filenames.
           draft: false
           prerelease: false
           make_latest: "true"
           overwrite_files: true
           fail_on_unmatched_files: true
-          files: |
-            dist/debbuild/ttf-mscorefonts-installer_*.deb
-            dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm
+          files: ${{ steps.files.outputs.release_files }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
