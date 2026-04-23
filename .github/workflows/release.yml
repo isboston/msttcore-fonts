@@ -20,46 +20,84 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch tags
+        run: |
+          git fetch --force --tags origin
+
       - name: Build DEB and RPM
         run: |
           sudo bash build.sh rpm deb
 
       - name: Prepare release metadata
         id: meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          stamp="$(date -u +%Y%m%d-%H%M%S)"
-          short_sha="$(git rev-parse --short=7 "${GITHUB_SHA}")"
-          archive_tag="archive-${stamp}-${short_sha}-r${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
-          archive_name="msttcore-fonts packages ${stamp} (${short_sha})"
+          set -euo pipefail
+
+          archive_previous=false
+          previous_commit=
+          previous_short=
+          archive_tag=
+          archive_name=
+
+          if git rev-parse -q --verify refs/tags/fonts >/dev/null; then
+            previous_commit="$(git rev-parse refs/tags/fonts^{commit})"
+            previous_short="$(git rev-parse --short=7 "${previous_commit}")"
+
+            if [ "${previous_commit}" != "${GITHUB_SHA}" ] && gh release view fonts >/dev/null 2>&1; then
+              stamp="$(date -u +%Y%m%d-%H%M%S)"
+              archive_tag="archive-${stamp}-${previous_short}-r${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+              archive_name="msttcore-fonts packages ${stamp} (${previous_short})"
+              archive_previous=true
+            fi
+          fi
+
           {
-            echo "stamp=${stamp}"
-            echo "short_sha=${short_sha}"
+            echo "archive_previous=${archive_previous}"
+            echo "previous_commit=${previous_commit}"
+            echo "previous_short=${previous_short}"
             echo "archive_tag=${archive_tag}"
             echo "archive_name=${archive_name}"
           } >> "${GITHUB_OUTPUT}"
 
+      - name: Download previous rolling release assets
+        if: steps.meta.outputs.archive_previous == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          rm -rf dist/archive-assets
+          mkdir -p dist/archive-assets
+          gh release download fonts \
+            --dir dist/archive-assets \
+            --pattern 'ttf-mscorefonts-installer_*.deb' \
+            --pattern 'msttcore-fonts-installer-*.noarch.rpm'
+
       - name: Create archive tag
+        if: steps.meta.outputs.archive_previous == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.meta.outputs.archive_tag }}" -m "Archived release for ${GITHUB_SHA}" "${GITHUB_SHA}"
+          git tag -a "${{ steps.meta.outputs.archive_tag }}" -m "Archived release for ${{ steps.meta.outputs.previous_commit }}" "${{ steps.meta.outputs.previous_commit }}"
           git push origin "refs/tags/${{ steps.meta.outputs.archive_tag }}"
 
       - name: Publish archive release
+        if: steps.meta.outputs.archive_previous == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.archive_tag }}
           name: ${{ steps.meta.outputs.archive_name }}
           body: |
-            Archived package snapshot for `${{ github.sha }}`.
+            Archived package snapshot for `${{ steps.meta.outputs.previous_commit }}`.
           draft: false
           prerelease: false
           make_latest: "false"
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            dist/debbuild/ttf-mscorefonts-installer_*.deb
-            dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm
+            dist/archive-assets/ttf-mscorefonts-installer_*.deb
+            dist/archive-assets/msttcore-fonts-installer-*.noarch.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
