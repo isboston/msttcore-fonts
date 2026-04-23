@@ -3,10 +3,6 @@ name: Build DEB/RPM and update rolling release
 on:
   workflow_dispatch:
 
-concurrency:
-  group: rolling-release-fonts
-  cancel-in-progress: false
-
 permissions:
   contents: write
 
@@ -17,29 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Build DEB and RPM
         run: |
           sudo bash build.sh rpm deb
-
-      - name: Remove old archived assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          if ! gh release view fonts >/dev/null 2>&1; then
-            exit 0
-          fi
-
-          while IFS= read -r name; do
-            case "$name" in
-              20????????-??????-*-ttf-mscorefonts-installer_*.deb|20????????-??????-*-msttcore-fonts-installer-*.noarch.rpm)
-                gh release delete-asset fonts "$name" --yes
-                ;;
-            esac
-          done < <(gh release view fonts --json assets --jq '.assets[].name')
 
       - name: Move rolling release tag
         run: |
@@ -53,10 +30,6 @@ jobs:
         with:
           tag_name: fonts
           name: "msttcore-fonts packages"
-          body: |
-            Rolling release for `${{ github.sha }}`.
-          draft: false
-          prerelease: false
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
