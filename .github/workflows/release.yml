@@ -40,6 +40,7 @@ jobs:
           previous_short=
           archive_tag=
           archive_name=
+          archive_dir="${RUNNER_TEMP}/archive-assets-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
           if git rev-parse -q --verify refs/tags/fonts >/dev/null; then
             previous_commit="$(git rev-parse refs/tags/fonts^{commit})"
@@ -59,6 +60,7 @@ jobs:
             echo "previous_short=${previous_short}"
             echo "archive_tag=${archive_tag}"
             echo "archive_name=${archive_name}"
+            echo "archive_dir=${archive_dir}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Download previous rolling release assets
@@ -67,10 +69,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          rm -rf dist/archive-assets
-          mkdir -p dist/archive-assets
+          rm -rf "${{ steps.meta.outputs.archive_dir }}"
+          mkdir -p "${{ steps.meta.outputs.archive_dir }}"
           gh release download fonts \
-            --dir dist/archive-assets \
+            --dir "${{ steps.meta.outputs.archive_dir }}" \
             --pattern 'ttf-mscorefonts-installer_*.deb' \
             --pattern 'msttcore-fonts-installer-*.noarch.rpm'
 
@@ -96,8 +98,8 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            dist/archive-assets/ttf-mscorefonts-installer_*.deb
-            dist/archive-assets/msttcore-fonts-installer-*.noarch.rpm
+            ${{ steps.meta.outputs.archive_dir }}/ttf-mscorefonts-installer_*.deb
+            ${{ steps.meta.outputs.archive_dir }}/msttcore-fonts-installer-*.noarch.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
