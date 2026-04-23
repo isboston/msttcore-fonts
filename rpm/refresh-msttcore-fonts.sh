@@ -292,7 +292,7 @@ do
         fi
 
         cabextract --lowercase ${VERBOSE_FLAG:--q} -F 'ppviewer.cab' "$df" 2>/dev/null
-        cabextract --lowercase ${VERBOSE_FLAG:--q} -F '*.ttf' --directory=${FONTDIR} ppviewer.cab 2>/dev/null
+        cabextract --lowercase ${VERBOSE_FLAG:--q} -F '*.ttf' -F '*.ttc' --directory=${FONTDIR} ppviewer.cab 2>/dev/null
         [ -n "$INSTALLED_LIST" ] && list_cab_contents $df ppviewer.cab >> "$INSTALLED_LIST"
 
         rm -f ppviewer.cab

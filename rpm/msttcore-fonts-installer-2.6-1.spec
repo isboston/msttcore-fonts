@@ -59,7 +59,7 @@ These are the fonts added:
     2006 Arial: bold, bold italic, italic, regular
     1998 Arial: black
     2007 Calabri: bold, bold italic, italic, regular
-    2007 Cambria: bold, bold italic, italic
+    2007 Cambria: bold, bold italic, italic, regular
     2007 Candara: bold, bold italic, italic, regular
     2007 Consolas: bold, bold italic, italic, regular
     2007 Constantia: bold, bold italic, italic, regular
@@ -91,10 +91,10 @@ install -m 0755 %{SOURCE1} $RPM_BUILD_ROOT/usr/lib/msttcore-fonts-installer/refr
 %postun
 if [ "$1" = "0" ]; then
   counter=0
-  for ff in %{fontdir}/*.ttf; do
+  for ff in %{fontdir}/*.ttf %{fontdir}/*.ttc; do
     if [ -f "$ff" ]; then
       if [ $counter -eq 0 ]; then
-        echo "### Removing ttf files in %{fontdir}" >&2
+        echo "### Removing font files in %{fontdir}" >&2
       fi
 
       # these files are installed "manually" so they must be removed "manually".
@@ -105,7 +105,7 @@ if [ "$1" = "0" ]; then
     fi
   done
   if [ $counter -gt 0 ]; then
-    echo "### ttf files already removed" >&2
+    echo "### font files already removed" >&2
   fi
   if [ -x %{_bindir}/fc-cache ]; then
     %{_bindir}/fc-cache -f %{fontdir} || :
