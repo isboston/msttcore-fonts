@@ -1,4 +1,4 @@
-name: Build DEB/RPM and update rolling release
+name: Build DEB/RPM and keep release history
 
 on:
   workflow_dispatch:
@@ -20,6 +20,49 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Build DEB and RPM
+        run: |
+          sudo bash build.sh rpm deb
+
+      - name: Prepare release metadata
+        id: meta
+        run: |
+          stamp="$(date -u +%Y%m%d-%H%M%S)"
+          short_sha="$(git rev-parse --short=7 "${GITHUB_SHA}")"
+          archive_tag="archive-${stamp}-${short_sha}-r${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+          archive_name="msttcore-fonts packages ${stamp} (${short_sha})"
+          {
+            echo "stamp=${stamp}"
+            echo "short_sha=${short_sha}"
+            echo "archive_tag=${archive_tag}"
+            echo "archive_name=${archive_name}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Create archive tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.meta.outputs.archive_tag }}" -m "Archived release for ${GITHUB_SHA}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${{ steps.meta.outputs.archive_tag }}"
+
+      - name: Publish archive release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.archive_tag }}
+          name: ${{ steps.meta.outputs.archive_name }}
+          body: |
+            Archived package snapshot for `${{ github.sha }}`.
+          draft: false
+          prerelease: false
+          make_latest: "false"
+          overwrite_files: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/debbuild/ttf-mscorefonts-installer_*.deb
+            dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-*.noarch.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Move rolling release tag
         run: |
           git config user.name "github-actions[bot]"
@@ -27,17 +70,16 @@ jobs:
           git tag -fa fonts -m "Rolling release for ${GITHUB_SHA}" "${GITHUB_SHA}"
           git push origin refs/tags/fonts --force
 
-      - name: Build DEB and RPM
-        run: |
-          sudo bash build.sh rpm deb
-
-      - name: Create / Update GitHub Release
+      - name: Update rolling release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: fonts
           name: "msttcore-fonts packages"
+          body: |
+            Rolling release for `${{ github.sha }}`.
           draft: false
           prerelease: false
+          make_latest: "true"
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
