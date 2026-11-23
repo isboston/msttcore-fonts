@@ -7,6 +7,13 @@ Builds packages:
 - DEB `ttf-mscorefonts-installer`
 - RPM `msttcore-fonts-installer`
 
+## Install on Rocky Linux 10
+
+```bash
+sudo dnf install epel-release
+sudo dnf install https://github.com/isboston/msttcore-fonts/releases/download/fonts/msttcore-fonts-installer-2.6-1.noarch.rpm
+```
+
 ## License
 Scripts are released under the MIT License.
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
