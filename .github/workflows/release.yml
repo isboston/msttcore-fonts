@@ -18,6 +18,19 @@ jobs:
         run: |
           sudo bash build.sh rpm deb
 
+      - name: Verify RPM fonts on Fedora 45
+        timeout-minutes: 10
+        run: |
+          docker run --rm -i -v "$PWD/dist/rpmbuild/RPMS/noarch:/rpms:ro" \
+            registry.fedoraproject.org/fedora:45 bash -e <<'BASH'
+          dnf -y install /rpms/msttcore-fonts-installer-*.noarch.rpm
+          for family in 'Times New Roman' Arial Calibri; do
+            match=$(fc-match -f '%{family[0]}: %{file}' "$family")
+            echo "Checking $family -> $match"
+            [[ $match == "$family: /usr/share/fonts/msttcore/"* ]] || exit 1
+          done
+          BASH
+
       - name: Move rolling release tag
         run: |
           git config user.name "github-actions[bot]"
