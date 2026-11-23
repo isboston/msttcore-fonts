@@ -59,11 +59,10 @@ Resulting artifacts:
 - RPM `dist/rpmbuild/RPMS/noarch/msttcore-fonts-installer-2.6-1.noarch.rpm`
 
 ## Install and check on Debian/Ubuntu
-Install dependencies and the package:
+Download and install the release package:
 ```bash
-sudo apt-get update
-sudo apt-get install -y fontconfig
-sudo apt install ./dist/debbuild/ttf-mscorefonts-installer_3.8.2_all.deb
+wget https://github.com/isboston/msttcore-fonts/releases/download/fonts/ttf-mscorefonts-installer_3.8.2_all.deb
+sudo apt install ./ttf-mscorefonts-installer_3.8.2_all.deb fontconfig
 ```
 
 Check that fonts are available:
