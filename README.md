@@ -13,6 +13,7 @@ Builds packages:
 sudo dnf install epel-release
 sudo dnf install https://github.com/isboston/msttcore-fonts/releases/download/fonts/msttcore-fonts-installer-2.6-1.noarch.rpm
 ```
+On Fedora 45, run only the second command.
 
 ## License
 Scripts are released under the MIT License.
