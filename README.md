@@ -15,6 +15,13 @@ sudo dnf install https://github.com/isboston/msttcore-fonts/releases/download/fo
 ```
 On Fedora 45, run only the second command.
 
+## Tested on
+
+| Distribution | Download |
+| --- | --- |
+| Fedora 45, Rocky Linux 10.3 (with EPEL) | [RPM 2.6-1](https://github.com/isboston/msttcore-fonts/releases/download/fonts/msttcore-fonts-installer-2.6-1.noarch.rpm) |
+| Debian 13, Ubuntu 24.04 LTS | [DEB 3.8.2](https://github.com/isboston/msttcore-fonts/releases/download/fonts/ttf-mscorefonts-installer_3.8.2_all.deb) |
+
 ## License
 Scripts are released under the MIT License.
 Microsoft Core Fonts are distributed under the [Microsoft EULA](https://sources.debian.org/src/ttf-mscorefonts-installer/latest/EULA/) and are not included in this repository.
