@@ -30,7 +30,7 @@ jobs:
         with:
           tag_name: fonts
           name: "msttcore-fonts packages"
-          overwrite_files: true
+          overwrite_files: false
           fail_on_unmatched_files: true
           files: |
             dist/debbuild/ttf-mscorefonts-installer_*.deb
